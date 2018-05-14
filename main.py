@@ -34,6 +34,25 @@ class DoubleTriggerFilterView:
         self.notes_on_events_passed = tk.IntVar(window)
         self.notes_on_events_skipped = tk.IntVar(window)
 
+##        self.filter2_enabled = tk.IntVar(window)
+##        self.min_delay2 = tk.DoubleVar(window)
+##        self.min_velocity2 = tk.DoubleVar(window)
+        
+        self.notes_on_events_passed = tk.IntVar(window)
+        self.notes_on_events_skipped = tk.IntVar(window)
+
+##        def set_min_velocity2(*args):
+##            self.midi_filter.min_velocity2 = self.min_velocity2.get()
+##        self.min_velocity.trace('w', set_min_velocity)
+##        
+##        def set_min_delay2(*args):
+##            self.midi_filter.min_delay2 = self.min_delay2.get()
+##        self.min_delay.trace('w', set_min_delay)
+##
+##        def filter2_enabled(*args):
+##            self.midi_filter.enabled2 = self.filter2_enabled.get()
+##        self.filter2_enabled.trace('w', filter2_enabled)
+
         self.setup_devices_frame()
         self.setup_filter_frame()
         self.setup_stats_frame()
@@ -87,6 +106,10 @@ class DoubleTriggerFilterView:
         except ValueError:
             pass
 
+##        self.min_delay.set(self.config.getfloat('filter2', 'min_delay', fallback=self.midi_filter.min_delay2))
+##        self.min_velocity.set(int(self.config.getfloat('filter2', 'min_velocity', fallback=self.midi_filter.min_velocity2)))
+##        self.filter1_enabled.set(int(self.config.getboolean('filter2', 'enabled', fallback=1)))
+
 
     def update_config(self):
         self.config.set('general', 'in', self.iportname.get())
@@ -95,6 +118,10 @@ class DoubleTriggerFilterView:
         self.config.set('filter1', 'min_delay', str(self.min_delay.get()))
         self.config.set('filter1', 'min_velocity', str(self.min_velocity.get()))
         self.config.set('filter1', 'enabled', str(self.filter1_enabled.get()))
+
+##        self.config.set('filter2', 'min_delay', str(self.min_delay2.get()))
+##        self.config.set('filter2', 'min_velocity', str(self.min_velocity2.get()))
+##        self.config.set('filter2', 'enabled', str(self.filter2_enabled.get()))
 
 
     def rescan(self):

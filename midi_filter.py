@@ -29,6 +29,9 @@ class MIDIFilter:
         self.enabled = True
         self.min_delay = 0.06 # in seconds
         self.min_velocity = 40
+        self.enabled2 = False
+        self.min_delay2 = 0.05  # in seconds
+        self.min_velocity2 = 80
         self.notes_on_events_passed = 0
         self.notes_on_events_skipped = 0
         self.stats_updated_cb = None
@@ -88,6 +91,11 @@ class MIDIFilter:
                     too_fast = delta < self.min_delay
                     too_weak = velocity < self.min_velocity
                     skip = skip or (too_fast and too_weak)
+					
+                if self.enabled2:
+                    too_fast2 = delta < self.min_delay2
+                    too_weak2 = velocity < self.min_velocity2
+                    skip = skip or (too_fast2 and too_weak2)
 
             if not skip:
                 if note_on:
