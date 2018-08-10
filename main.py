@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright (c) 2018 Gennadi Iosad.
 # All Rights Reserved.
 # You may use, distribute and modify this code under the
