@@ -13,7 +13,7 @@ import rtmidi
 import sys
 import time
 
-def xprint(*args, **kwargs):
+def debug_log(*args, **kwargs):
     t = time.time()
     timestamp = time.strftime('%H:%M:%S', time.localtime(t)) + '.{:03}'.format(int(t * 1000) % 1000)
     print(timestamp, *args, **kwargs)
@@ -98,20 +98,20 @@ class MIDIFilter:
             else:
                 self.notes_on_events_skipped += 1
                 self.stats_updated()
-                xprint('Skipping note_on of note {}, delta {:.3f}, velocity={}'.format(msg[1], delta, msg[2]))
+                debug_log('Skipping note_on of note {}, delta {:.3f}, velocity={}'.format(msg[1], delta, msg[2]))
 
         self._oport.open_port(self._port_index_by_name(self._oport, oportname))
         if not self._oport.is_port_open():
-            xprint('Output MIDI device is not found')
+            debug_log('Output MIDI device is not found')
             return
 
         self._iport.set_callback(handle_in)
         self._iport.open_port(self._port_index_by_name(self._iport, iportname))
         if not self._iport.is_port_open():
-            xprint('Input MIDI device is not found')
+            debug_log('Input MIDI device is not found')
             return
 
-        xprint('Ports open')
+        debug_log('Ports open')
         self._is_running = True
 
 
@@ -126,4 +126,4 @@ class MIDIFilter:
             self._oport.close_port()
             self._oport = None
 
-        xprint('MIDI ports closed')
+        debug_log('MIDI ports closed')
