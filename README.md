@@ -1,8 +1,10 @@
 # [midi-double-trigger-filter](https://github.com/giosad/midi-double-trigger-filter)
 Processes MIDI events from a controller to filter note-on events caused by unintended double triggering.
 
-Confirmed to work on Win10 with MPD218.
+Confirmed to work with MPD218 in Win10 and macOs.
 
+## Screenshot
+[![midi-note-double-trigger-filter.png](https://s33.postimg.cc/p3emgfmnz/midi-note-double-trigger-filter.png)](https://postimg.cc/image/yny93bbzv/)
 ## Requirements
 For MIDI filtering you need :
 - Virtual midi device
