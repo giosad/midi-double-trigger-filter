@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Copyright (c) 2018 Gennadi Iosad.
 # All Rights Reserved.
 # You may use, distribute and modify this code under the
@@ -22,17 +24,17 @@ class DoubleTriggerFilterView:
         self.config = config
 
         # vars
-        self.iportname = tk.StringVar(window)
-        self.oportname = tk.StringVar(window)
-        self.status = tk.StringVar(window)
-        self.autostart = tk.IntVar(window)
+        self.iportname = tk.StringVar(self.root)
+        self.oportname = tk.StringVar(self.root)
+        self.status = tk.StringVar(self.root)
+        self.autostart = tk.IntVar(self.root)
 
-        self.filter1_enabled = tk.IntVar(window)
-        self.min_delay = tk.StringVar(window)
-        self.min_velocity = tk.StringVar(window)
+        self.filter1_enabled = tk.IntVar(self.root)
+        self.min_delay = tk.StringVar(self.root)
+        self.min_velocity = tk.StringVar(self.root)
 
-        self.notes_on_events_passed = tk.IntVar(window)
-        self.notes_on_events_skipped = tk.IntVar(window)
+        self.notes_on_events_passed = tk.IntVar(self.root)
+        self.notes_on_events_skipped = tk.IntVar(self.root)
 
         self.setup_devices_frame()
         self.setup_filter_frame()
@@ -42,13 +44,14 @@ class DoubleTriggerFilterView:
         self.rescan()
         self.load_config()
 
-
-        def stats_updated_cb():
+        def update_stats():
             self.notes_on_events_passed.set(self.midi_filter.notes_on_events_passed)
             self.notes_on_events_skipped.set(self.midi_filter.notes_on_events_skipped)
-        self.midi_filter.stats_updated_cb = stats_updated_cb
-        stats_updated_cb()
 
+        REFRESH_GUI_EVENT = '<<RefreshGUI>>'
+        self.root.bind(REFRESH_GUI_EVENT, lambda event: update_stats())
+        self.midi_filter.stats_updated_cb = lambda: self.root.event_generate(REFRESH_GUI_EVENT, when="tail")
+        self.midi_filter.stats_updated_cb()
 
         def set_min_velocity(*args):
             try:
@@ -58,7 +61,6 @@ class DoubleTriggerFilterView:
             self.midi_filter.min_velocity = v
         self.min_velocity.trace('w', set_min_velocity)
 
-
         def set_min_delay(*args):
             try:
                 v = float(self.min_delay.get())
@@ -67,13 +69,14 @@ class DoubleTriggerFilterView:
             self.midi_filter.min_delay = v
         self.min_delay.trace('w', set_min_delay)
 
-
         def filter1_enabled(*args):
             self.midi_filter.enabled = self.filter1_enabled.get()
         self.filter1_enabled.trace('w', filter1_enabled)
 
         if self.autostart.get():
             self.start()
+        else:
+            self.update_status()
 
 
     def load_config(self):
@@ -113,7 +116,10 @@ class DoubleTriggerFilterView:
 
 
     def start(self):
-        self.midi_filter.start(self.iportname.get(), self.oportname.get())
+        try:
+            self.midi_filter.start(self.iportname.get(), self.oportname.get())
+        except OverflowError as e:
+            debug_log('Exception in midi_filter:', e)
         self.update_status()
 
 
@@ -207,43 +213,46 @@ class DoubleTriggerFilterView:
 
 
     def setup_operations_frame(self):
-        operation_frame = tk.Frame(window)
+        operation_frame = tk.Frame(self.root)
         operation_frame.pack()
 
         start_btn = ttk.Button(operation_frame, textvariable = self.status, command = lambda:self.toggle_start_stop())
-        start_btn.pack(pady=5, ipady=2)
+        start_btn.pack(pady=5, ipady=5)
 
-        autostart_chkbtn = ttk.Checkbutton(window, text='Autostart', variable = self.autostart)
+        autostart_chkbtn = ttk.Checkbutton(operation_frame, text='Autostart', variable = self.autostart)
         autostart_chkbtn.pack(pady=10)
 
 
+def main():
+    # Config.
+    config_dir = appdirs.user_config_dir('midi-note-double-trigger-filter', '')
+    config_path = os.path.join(config_dir, 'midi-note-double-trigger-filter.cfg')
+    debug_log('Config at:', config_path)
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    if 'general' not in config: config.add_section('general')
+    if 'filter1' not in config: config.add_section('filter1')
 
-# Config.
-config_dir = appdirs.user_config_dir('midi-note-double-trigger-filter', '')
-config_path = os.path.join(config_dir, 'midi-note-double-trigger-filter.cfg')
-xprint('Config at:', config_path)
-config = configparser.ConfigParser()
-config.read(config_path)
-if 'general' not in config: config.add_section('general')
-if 'filter1' not in config: config.add_section('filter1')
+    # Model and view
+    window = tk.Tk()
+    window.title("MIDI Note Double Trigger Filter")
 
-# Model and view
-window = tk.Tk()
-window.title("MIDI Note Double Trigger Filter")
+    midi_filter = MIDIFilter()
+    view = DoubleTriggerFilterView(window, midi_filter, config)
 
-midi_filter = MIDIFilter()
-view = DoubleTriggerFilterView(window, midi_filter, config)
+    window.update()
+    window.minsize(window.winfo_width(), window.winfo_height())
+    window.mainloop()
 
-window.update()
-window.minsize(window.winfo_width(), window.winfo_height())
-window.mainloop()
+    midi_filter.stats_updated_cb = None
+    view.update_config()
 
-midi_filter.stats_updated_cb = None
-view.update_config()
+    # Save config to file
+    if not os.path.exists(config_dir):
+        os.makedirs(config_dir)
+    config.write(open(config_path, 'w'))
 
-# Save config to file
-if not os.path.exists(config_dir):
-    os.makedirs(config_dir)
-config.write(open(config_path, 'w'))
+    debug_log('EXIT')
 
-xprint('EXIT')
+
+main()
