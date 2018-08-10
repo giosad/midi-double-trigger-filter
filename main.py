@@ -44,12 +44,14 @@ class DoubleTriggerFilterView:
         self.rescan()
         self.load_config()
 
-        def stats_updated_cb():
+        def update_stats():
             self.notes_on_events_passed.set(self.midi_filter.notes_on_events_passed)
             self.notes_on_events_skipped.set(self.midi_filter.notes_on_events_skipped)
-        self.midi_filter.stats_updated_cb = stats_updated_cb
-        stats_updated_cb()
 
+        REFRESH_GUI_EVENT = '<<RefreshGUI>>'
+        self.root.bind(REFRESH_GUI_EVENT, lambda event: update_stats())
+        self.midi_filter.stats_updated_cb = lambda: self.root.event_generate(REFRESH_GUI_EVENT, when="tail")
+        self.midi_filter.stats_updated_cb()
 
         def set_min_velocity(*args):
             try:
