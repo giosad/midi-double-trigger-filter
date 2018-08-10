@@ -115,7 +115,10 @@ class DoubleTriggerFilterView:
 
 
     def start(self):
-        self.midi_filter.start(self.iportname.get(), self.oportname.get())
+        try:
+            self.midi_filter.start(self.iportname.get(), self.oportname.get())
+        except OverflowError as e:
+            debug_log('Exception in midi_filter:', e)
         self.update_status()
 
 
