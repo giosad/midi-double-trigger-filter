@@ -221,7 +221,7 @@ class DoubleTriggerFilterView:
 # Config.
 config_dir = appdirs.user_config_dir('midi-note-double-trigger-filter', '')
 config_path = os.path.join(config_dir, 'midi-note-double-trigger-filter.cfg')
-xprint('Config at:', config_path)
+debug_log('Config at:', config_path)
 config = configparser.ConfigParser()
 config.read(config_path)
 if 'general' not in config: config.add_section('general')
@@ -246,4 +246,4 @@ if not os.path.exists(config_dir):
     os.makedirs(config_dir)
 config.write(open(config_path, 'w'))
 
-xprint('EXIT')
+debug_log('EXIT')
