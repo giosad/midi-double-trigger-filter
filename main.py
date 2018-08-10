@@ -44,7 +44,6 @@ class DoubleTriggerFilterView:
         self.rescan()
         self.load_config()
 
-
         def stats_updated_cb():
             self.notes_on_events_passed.set(self.midi_filter.notes_on_events_passed)
             self.notes_on_events_skipped.set(self.midi_filter.notes_on_events_skipped)
@@ -60,7 +59,6 @@ class DoubleTriggerFilterView:
             self.midi_filter.min_velocity = v
         self.min_velocity.trace('w', set_min_velocity)
 
-
         def set_min_delay(*args):
             try:
                 v = float(self.min_delay.get())
@@ -68,7 +66,6 @@ class DoubleTriggerFilterView:
                 v = 0
             self.midi_filter.min_delay = v
         self.min_delay.trace('w', set_min_delay)
-
 
         def filter1_enabled(*args):
             self.midi_filter.enabled = self.filter1_enabled.get()
