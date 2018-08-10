@@ -76,6 +76,8 @@ class DoubleTriggerFilterView:
 
         if self.autostart.get():
             self.start()
+        else:
+            self.update_status()
 
 
     def load_config(self):
